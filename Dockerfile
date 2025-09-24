@@ -1,13 +1,28 @@
-# syntax=docker/dockerfile:1
+# Estágio 1: Build da aplicação
+FROM maven:4.0.0-rc-4-amazoncorretto-21 AS build
+WORKDIR /app
+
+# Copiar arquivos de configuração Maven
+COPY pom.xml .
+
+# Baixar dependências (cache layer)
+RUN mvn dependency:go-offline -B
+
+# Copiar código fonte
+COPY src ./src
+
+# Compilar aplicação
+RUN mvn clean package -DskipTests -B
+
+# Estágio 2: Runtime
 FROM openjdk:21-jdk-slim
 
+# Metadados
 LABEL maintainer="tabajara@mail.com"
-LABEL description="Sistema de Login com Spring Boot"
+LABEL description="Sistema de Login com Spring Boot - Auto Build"
 
-# Instalar ferramentas necessárias
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar curl para health check
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Criar usuário não-root
 RUN groupadd -r appuser && useradd -r -g appuser appuser
@@ -15,8 +30,8 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 # Diretório de trabalho
 WORKDIR /app
 
-# Copiar arquivo JAR
-COPY target/login-system-*.jar app.jar
+# Copiar JAR do estágio de build
+COPY --from=build /app/target/*.jar app.jar
 
 # Mudar proprietário
 RUN chown -R appuser:appuser /app
