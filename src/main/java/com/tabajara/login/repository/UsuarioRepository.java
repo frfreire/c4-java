@@ -13,17 +13,21 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    Optional<Usuario> procurarPorUsername(String username);
+    // Renomeado para seguir a convenção do Spring Data JPA
+    Optional<Usuario> findByUsername(String username);
 
-    Optional<Usuario> procurarPorEmail(String email);
+    // Renomeado para seguir a convenção do Spring Data JPA
+    Optional<Usuario> findByEmail(String email);
 
-    Optional<Usuario> procurarPorUsernameOuEmail(String username, String email);
+    Optional<Usuario> findByUsernameOrEmail(String username, String email);
 
-    boolean verificaUsernameExiste(String username);
+    // Renomeado para seguir a convenção do Spring Data JPA
+    boolean existsByUsername(String username);
 
-    boolean verificaEmailExiste(String email);
+    // Renomeado para seguir a convenção do Spring Data JPA
+    boolean existsByEmail(String email);
 
     @Modifying
     @Query("UPDATE Usuario u SET u.ultimoLogin = :ultimoLogin WHERE u.id = :userId")
-    void updateLastLogin(@Param("userId") Long userId, @Param("lastLogin") LocalDateTime lastLogin);
+    void updateLastLogin(@Param("userId") Long userId, @Param("ultimoLogin") LocalDateTime ultimoLogin);
 }

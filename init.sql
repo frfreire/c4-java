@@ -4,18 +4,10 @@
 -- Criar extensões necessárias
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-
-    private boolean ativo = true;
-    private boolean contaNaoExpirada = true;
-    private boolean contaNaoBloqueada = true;
-    private boolean credencialNaoExpirada = true;
-    private LocalDateTime criadoEm = LocalDateTime.now();
-    private LocalDateTime ultimoLogin;
-
 -- Criar tabela de usuários (caso não exista)
 CREATE TABLE IF NOT EXISTS usuarios (
-                                     id BIGSERIAL PRIMARY KEY,
-                                     username VARCHAR(50) UNIQUE NOT NULL,
+                                        id BIGSERIAL PRIMARY KEY,
+                                        username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'USUARIO',
@@ -29,19 +21,18 @@ CREATE TABLE IF NOT EXISTS usuarios (
     );
 
 -- Criar índices para performance
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(criadoEm);
+CREATE INDEX IF NOT EXISTS idx_usuarios_username ON usuarios(username);
+CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
 
 -- Inserir usuário administrador padrão
 -- Senha: admin123 (BCrypt hash)
-INSERT INTO users (username, email, password, role, ativo) VALUES
+INSERT INTO usuarios (username, email, password, role, ativo) VALUES
     ('admin', 'admin@tabajara.com', '$2a$10$GRLdNijSQMUvl/au9ofL.eDDmxTlVEukvq1dXKx9vfmHDNk9U8e4a', 'ADMIN', true)
     ON CONFLICT (username) DO NOTHING;
 
 -- Inserir usuário comum para testes
 -- Senha: user123 (BCrypt hash)
-INSERT INTO users (username, email, password, role, enabled) VALUES
+INSERT INTO usuarios (username, email, password, role, ativo) VALUES
     ('fabricio', 'fabricio@tabajara.com', '$2a$10$b.3l7/3ZvJ7U7XKxOQE2YuE6aTa3L1zB5s3F1J5u4M8xF2aD1bF3G', 'USUARIO', true)
     ON CONFLICT (username) DO NOTHING;
 

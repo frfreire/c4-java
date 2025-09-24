@@ -20,7 +20,7 @@ public class UsuarioDetalheService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.procurarPorUsernameOuEmail(username, username)
+        Usuario usuario = usuarioRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
 
         return usuario;

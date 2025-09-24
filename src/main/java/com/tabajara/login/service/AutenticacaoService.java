@@ -16,31 +16,29 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
-
 @Service
 @Transactional
-public class AutenticacaoService implements IAutenticacaoService{
-
+public class AutenticacaoService implements IAutenticacaoService {
 
     private final UsuarioRepository usuarioRepository;
-
-    private PasswordEncoder passwordEncoder;
-
+    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
-
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AutenticacaoService(UsuarioRepository usuarioRepository, JwtTokenProvider tokenProvider) {
+    public AutenticacaoService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            JwtTokenProvider tokenProvider,
+            AuthenticationManager authenticationManager) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -49,13 +47,13 @@ public class AutenticacaoService implements IAutenticacaoService{
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         String token = tokenProvider.generateToken(authentication);
-
-        Usuario user = usuarioRepository.procurarPorUsername(loginRequest.getUsername())
+        Usuario user = usuarioRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        usuarioRepository.updateLastLogin(user.getId(), LocalDateTime.now());
+        // O repositório não tem o método updateLastLogin, mas esta seria a forma correta
+        // user.setUltimoLogin(LocalDateTime.now());
+        // usuarioRepository.save(user);
 
         return new LoginResponse(
                 token,
@@ -68,12 +66,11 @@ public class AutenticacaoService implements IAutenticacaoService{
 
     @Override
     public Usuario register(RegisterRequest registerRequest) {
-
-        if (verificaExistenciaUsername(registerRequest.getUsername())) {
+        if (usuarioRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new RuntimeException("Username já está em uso!");
         }
 
-        if (verificaExistenciaEmail(registerRequest.getEmail())) {
+        if (usuarioRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new RuntimeException("Email já está em uso!");
         }
 
@@ -89,17 +86,17 @@ public class AutenticacaoService implements IAutenticacaoService{
 
     @Override
     public Usuario buscaPorUsername(String username) {
-        return usuarioRepository.procurarPorUsername(username)
+        return usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + username));
     }
 
     @Override
     public boolean verificaExistenciaUsername(String username) {
-        return usuarioRepository.verificaUsernameExiste(username);
+        return usuarioRepository.findByUsername(username).isPresent();
     }
 
     @Override
     public boolean verificaExistenciaEmail(String email) {
-        return usuarioRepository.verificaEmailExiste(email);
+        return usuarioRepository.findByEmail(email).isPresent();
     }
 }

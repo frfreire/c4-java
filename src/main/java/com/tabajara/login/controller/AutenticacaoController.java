@@ -73,7 +73,7 @@ public class AutenticacaoController {
     }
 
     @GetMapping("/profile")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'MODERADOR')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN', 'MODERADOR')")
     @Operation(summary = "Perfil do usuário", description = "Retorna informações do usuário autenticado")
     public ResponseEntity<?> getProfile(Authentication authentication) {
         try {

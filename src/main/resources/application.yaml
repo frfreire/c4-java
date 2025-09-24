@@ -1,37 +1,36 @@
-# Configuração para desenvolvimento
+# ========================================
+# --- Configuração Padrão (dev) ---
+# ========================================
 spring:
   application:
     name: login-system
-    profiles:
-      active: dev
-
-datasource:
-  url: jdbc:postgresql://localhost:5432/login_db
-  username: login_user
-  password: login_pass
-  driver-class-name: org.postgresql.Driver
-  hikari:
-    maximum-pool-size: 10
-    minimum-idle: 2
-    idle-timeout: 300000
-    max-lifetime: 1200000
-
-jpa:
-  hibernate:
-    ddl-auto: update # Em produção usar 'validate'
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/login_db
+    username: login_user
+    password: login_pass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 1200000
+  jpa:
+    hibernate:
+      ddl-auto: update # Em produção usar 'validate'
     show-sql: false
     properties:
-    hibernate:
-    dialect: org.hibernate.dialect.PostgreSQLDialect
-    format_sql: true
-
-jackson:
-  property-naming-strategy: SNAKE_CASE
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  jackson:
+    property-naming-strategy: SNAKE_CASE
 
 server:
   port: 8081
   servlet:
-  context-path: /
+    context-path: /
 
 # JWT Configuration
 jwt:
@@ -44,9 +43,9 @@ management:
     web:
       exposure:
         include: health,info,metrics
-        endpoint:
-          health:
-            show-details: when_authorized
+  endpoint:
+    health:
+      show-details: when_authorized
 
 # Logging
 logging:
@@ -54,49 +53,50 @@ logging:
     com.tabajara.login: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
-    pattern:
-      console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-      file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Configuração para testes
+---
+# ========================================
+# --- Configuração para Testes (test) ---
+# ========================================
 spring:
   config:
     activate:
       on-profile: test
-
-datasource:
-  url: jdbc:h2:mem:testdb
-  driver-class-name: org.h2.Driver
-  username: sa
-  password:
-
-h2:
-  console:
-    enabled: true
-
-jpa:
-  hibernate:
-    ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
     show-sql: true
 
 jwt:
   secret: test-secret-key-for-testing-purposes-only
   expiration: 3600000 # 1 hora para testes
 
-# Configuração para produção
+---
+# ========================================
+# --- Configuração para Produção (prod) ---
+# ========================================
 spring:
   config:
     activate:
       on-profile: prod
-
-datasource:
-  url: ${DATABASE_URL}
-  username: ${DATABASE_USERNAME}
-  password: ${DATABASE_PASSWORD}
-
-jpa:
-  hibernate:
-    ddl-auto: validate
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
     show-sql: false
 
 server:
