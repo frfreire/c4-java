@@ -82,7 +82,7 @@ public class AutenticacaoController {
         System.out.println("=== DEBUG PROFILE ENDPOINT ===");
 
         try {
-            // Debug do Authentication
+
             System.out.println("Authentication object: " + authentication);
             System.out.println("Authentication is null: " + (authentication == null));
 
@@ -93,7 +93,7 @@ public class AutenticacaoController {
                 System.out.println("Authentication.isAuthenticated(): " + authentication.isAuthenticated());
             }
 
-            // Debug do SecurityContext
+
             Authentication contextAuth = SecurityContextHolder.getContext().getAuthentication();
             System.out.println("SecurityContext Authentication: " + contextAuth);
             if (contextAuth != null) {
@@ -101,7 +101,7 @@ public class AutenticacaoController {
                 System.out.println("Context Authentication.getPrincipal(): " + contextAuth.getPrincipal());
             }
 
-            // Verificar se temos um nome de usuário
+
             String username = null;
             if (authentication != null && authentication.getName() != null) {
                 username = authentication.getName();
