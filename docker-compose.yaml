@@ -1,0 +1,81 @@
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: login-postgres
+    environment:
+      POSTGRES_DB: login_db
+      POSTGRES_USER: login_user
+      POSTGRES_PASSWORD: login_pass
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - login-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U login_user -d login_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação Spring Boot
+  login-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: login-spring-app
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JWT_SECRET: docker-super-secret-key-for-development-only
+      DATABASE_URL: jdbc:postgresql://postgres:5432/login_db
+      DATABASE_USERNAME: login_user
+      DATABASE_PASSWORD: login_pass
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - login-network
+    restart: unless-stopped
+
+  # Frontend React (opcional)
+  login-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: login-react-app
+    environment:
+      REACT_APP_API_BASE_URL: http://localhost:8081/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - login-app
+    networks:
+      - login-network
+    restart: unless-stopped
+
+  # Nginx como Gateway (opcional)
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: login-nginx-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - login-app
+      - login-frontend
+    networks:
+      - login-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  login-network:
+    driver: bridge

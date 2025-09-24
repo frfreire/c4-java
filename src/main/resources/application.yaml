@@ -1,0 +1,112 @@
+# Configuração para desenvolvimento
+spring:
+  application:
+    name: login-system
+    profiles:
+      active: dev
+
+datasource:
+  url: jdbc:postgresql://localhost:5432/login_db
+  username: login_user
+  password: login_pass
+  driver-class-name: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 2
+    idle-timeout: 300000
+    max-lifetime: 1200000
+
+jpa:
+  hibernate:
+    ddl-auto: update # Em produção usar 'validate'
+    show-sql: false
+    properties:
+    hibernate:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    format_sql: true
+
+jackson:
+  property-naming-strategy: SNAKE_CASE
+
+server:
+  port: 8081
+  servlet:
+  context-path: /
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:minha-chave-secreta-super-segura-deve-ter-pelo-menos-256-bits-para-funcionar-corretamente}
+  expiration: 86400000 # 24 horas em millisegundos
+
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+        endpoint:
+          health:
+            show-details: when_authorized
+
+# Logging
+logging:
+  level:
+    com.tabajara.login: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+      file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Configuração para testes
+spring:
+  config:
+    activate:
+      on-profile: test
+
+datasource:
+  url: jdbc:h2:mem:testdb
+  driver-class-name: org.h2.Driver
+  username: sa
+  password:
+
+h2:
+  console:
+    enabled: true
+
+jpa:
+  hibernate:
+    ddl-auto: create-drop
+    show-sql: true
+
+jwt:
+  secret: test-secret-key-for-testing-purposes-only
+  expiration: 3600000 # 1 hora para testes
+
+# Configuração para produção
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+datasource:
+  url: ${DATABASE_URL}
+  username: ${DATABASE_USERNAME}
+  password: ${DATABASE_PASSWORD}
+
+jpa:
+  hibernate:
+    ddl-auto: validate
+    show-sql: false
+
+server:
+  port: ${PORT:8081}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+logging:
+  level:
+    com.tabajara.login: INFO
+    org.springframework.security: WARN
