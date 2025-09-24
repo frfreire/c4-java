@@ -73,7 +73,7 @@ public class AutenticacaoController {
     }
 
     @GetMapping("/profile")
-    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN', 'MODERADOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USUARIO', 'ROLE_ADMIN', 'ROLE_MODERADOR')")
     @Operation(summary = "Perfil do usuário", description = "Retorna informações do usuário autenticado")
     public ResponseEntity<?> getProfile(Authentication authentication) {
         try {
@@ -104,7 +104,7 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/logout")
-    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN', 'MODERADOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USUARIO', 'ROLE_ADMIN', 'ROLE_MODERADOR')")
     @Operation(summary = "Logout", description = "Logout do usuário (invalidar token no frontend)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Instruções de logout retornadas com sucesso",
