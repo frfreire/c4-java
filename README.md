@@ -27,8 +27,8 @@ Antes de executar o sistema, certifique-se de ter instalado:
 ### 1. Clone do Repositório
 
 ```bash
-git clone <url-do-repositorio>
-cd login-system
+git clone [https://github.com/frfreire/c4-java.git](https://github.com/frfreire/c4-java.git)
+cd login
 ```
 
 ### 2. Configuração do Banco de Dados
