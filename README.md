@@ -12,6 +12,7 @@ Sistema de autenticação desenvolvido em Spring Boot com JWT, oferecendo endpoi
 - JWT (JSON Web Token)
 - Maven
 - Swagger/OpenAPI 3
+- Spring Boot Actuator
 
 ## Pré-requisitos
 
